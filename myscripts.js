@@ -1,276 +1,109 @@
-/*=================================
-=            FUNCTIONS            =
-=================================*/
-// window size function
-function wndsize() {
-	var w = 0;
-	var h = 0;
-	//IE
-	if (!window.innerWidth) {
-		if (!(document.documentElement.clientWidth == 0)) {
-			//strict mode
-			w = document.documentElement.clientWidth;
-			h = document.documentElement.clientHeight;
-		} else {
-			//quirks mode
-			w = document.body.clientWidth;
-			h = document.body.clientHeight;
-		}
-	} else {
-		//w3c
-		w = window.innerWidth;
-		h = window.innerHeight;
-	}
-	return {
-		width: w,
-		height: h
-	};
-}
+const $ = (s, o = document) => o.querySelector(s);
+const $$ = (s, o = document) => o.querySelectorAll(s);
 
-// map function
-Number.prototype.map = function ( in_min , in_max , out_min , out_max ) {
-	return ( this - in_min ) * ( out_max - out_min ) / ( in_max - in_min ) + out_min;
-}
+$$('.button').forEach(button => {
 
-/*=================================
-=            VARIABLES            =
-=================================*/
-var doc = document,
-	page = doc.getElementById('page'),
-	timeAnim = 1.25;
+    let icon = $('.icon', button),
+        arrow = $('.icon > svg', button),
+        line = $('.icon div svg', button),
+        svgPath = new Proxy({
+            y: null
+        }, {
+            set(target, key, value) {
+                target[key] = value;
+                if(target.y !== null) {
+                    line.innerHTML = getPath(target.y, .25, null);
+                }
+                return true;
+            },
+            get(target, key) {
+                return target[key];
+            }
+        });
 
+    svgPath.y = 12;
 
-/*========================================
-=            REACT COMPONENTS            =
-========================================*/
+    button.addEventListener('click', e => {
+        if(!button.classList.contains('loading')) {
 
+            button.classList.add('loading');
 
-var Ripple = React.createClass({
-	getInitialState: function() {
-		return {
-			x:"",
-			y: "",
-			w: wndsize().width,
-			h: wndsize().height
-		}
-	},
-	rippleAnim: function(event) {
+            gsap.timeline({
+                repeat: 2
+            }).to(svgPath, {
+                y: 17,
+                duration: .17,
+                delay: .03
+            }).to(svgPath, {
+                y: 12,
+                duration: .3,
+                ease: Elastic.easeOut.config(1, .35)
+            });
 
-		var dom 			= this.refs.ripple.getDOMNode(),
-			greenDom 		= this.refs.greenripple.getDOMNode(),
-			tl 				= new TimelineMax(),
-			offsetX			= Math.abs( (this.state.w / 2) - event.pageX ),
-			offsetY			= Math.abs( (this.state.h / 2) - event.pageY ),
-			deltaX			= (this.state.w / 2) + offsetX,
-			deltaY			= (this.state.h / 2) + offsetY,
-			scale_ratio		= Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+            gsap.timeline({
+                repeat: 2,
+                repeatDelay: .1,
+                onComplete() {
+                    gsap.to(arrow, {
+                        '--y': -17.5,
+                        duration: .4
+                    });
+                    setTimeout(() => button.classList.add('complete'), 200);
+                }
+            }).to(arrow, {
+                '--y': 9,
+                duration: .2
+            }).to(arrow, {
+                '--y': -9,
+                duration: .2
+            });
 
-		TweenMax.set([dom, greenDom], {transformOrigin: "center center"});
+            gsap.timeline().to(icon, {
+                y: 4,
+                duration: .2
+            }).to(icon, {
+                y: 8,
+                duration: .2,
+                delay: .2
+            }).to(icon, {
+                y: 12,
+                duration: .2,
+                delay: .2
+            }).to(icon, {
+                y: 18,
+                duration: .2,
+                delay: .2
+            });
 
-		tl
-		.to(dom, timeAnim, {
-			attr: {
-				r: scale_ratio
-			},
-			ease: Power3.easeOut,
-			onComplete: function() {
-				classie.add(page, "orange");
-			}
-		})
-		.to(dom, 2*timeAnim, {
-			attr: {
-				r: 32
-			},
-			delay: timeAnim/3,
-			ease: Power0.easeNone
-		})
-		.to(greenDom, timeAnim/2, {
-			attr: {
-				r: scale_ratio
-			},
-			delay: timeAnim/3,
-			ease: Power3.easeOut
-		});
-	},
-	componentWillReceiveProps: function(nextProps) {
-		if (nextProps.activity === "play") {
-
-			switch(nextProps.point) {
-				case "one":
-					this.setState({
-						x: nextProps.event.pageX,
-						y: nextProps.event.pageY
-					});
-					this.rippleAnim(nextProps.event);
-					break;
-				case "two":
-					var dom 			= this.refs.ripple.getDOMNode(),
-						greenDom 		= this.refs.greenripple.getDOMNode(),
-						tl 				= new TimelineMax(),
-						offsetX			= Math.abs( (this.state.w / 2) - this.state.x ),
-						offsetY			= Math.abs( (this.state.h / 2) - this.state.y ),
-						deltaX			= (this.state.w / 2) + offsetX,
-						deltaY			= (this.state.h / 2) + offsetY,
-						scale_ratio		= Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
-
-					tl
-					.to(dom, timeAnim, {
-						attr: {
-							r: scale_ratio
-						},
-						onComplete: function() {
-							classie.remove(page, "orange");
-							TweenMax.set(greenDom, {
-								attr: {
-									r: 32
-								}
-							});
-						},
-						ease: Power3.easeOut
-					})
-					.to(dom, timeAnim/2, {
-						attr: {
-							r: 32
-						},
-						ease: Power3.easeOut
-					});
-					break;
-			}
-		}
-	},
-	render: function() {
-		return (
-			<svg height="1" width="1">
-				<circle ref="greenripple" id="green_ripple" cx="0" cy="0" r="32" />
-				<circle ref="ripple" id="white_ripple" cx="0" cy="0" r="32" />
-			</svg>
-		);
-	}
+        }
+        e.preventDefault();
+    });
 
 });
 
+function getPoint(point, i, a, smoothing) {
+    let cp = (current, previous, next, reverse) => {
+            let p = previous || current,
+                n = next || current,
+                o = {
+                    length: Math.sqrt(Math.pow(n[0] - p[0], 2) + Math.pow(n[1] - p[1], 2)),
+                    angle: Math.atan2(n[1] - p[1], n[0] - p[0])
+                },
+                angle = o.angle + (reverse ? Math.PI : 0),
+                length = o.length * smoothing;
+            return [current[0] + Math.cos(angle) * length, current[1] + Math.sin(angle) * length];
+        },
+        cps = cp(a[i - 1], a[i - 2], point, false),
+        cpe = cp(point, a[i - 1], a[i + 1], true);
+    return `C ${cps[0]},${cps[1]} ${cpe[0]},${cpe[1]} ${point[0]},${point[1]}`;
+}
 
-var Button = React.createClass({
-	handleClick: function(e) {
-		var self = this;
-		if (this.state.action === "paused") {
-			this.setState({
-				action: "play",
-				point: "one",
-				progress: 0,
-				event: e.nativeEvent
-			});
-			var arrow 		= this.refs.arrow_icon.getDOMNode(),
-				done 		= this.refs.done_icon.getDOMNode(),
-				progress 	= this.refs.progress.getDOMNode(),
-				tl 			= new TimelineMax();
-
-			tl.fromTo(arrow, timeAnim, {
-				yPercent: 0,
-				autoAlpha: 1,
-				scale: 1
-			},{
-				yPercent: 20,
-				autoAlpha: 0,
-				//delay: timeAnim/3,
-				ease: Power3.easeOut
-			})
-			.fromTo(progress, 2*timeAnim/3, {
-				yPercent: -20,
-				autoAlpha: 0,
-				scale: 0.6
-			},{
-				yPercent: 0,
-				autoAlpha: 1,
-				scale: 1,
-				ease: Power3.easeOut
-			}, "-="+timeAnim/3)
-			.to(self.state, 2*timeAnim, {
-				progress: 100,
-				ease: Power0.easeNone,
-				onUpdate: function(tween) {
-					self.setState({
-						progress: parseInt(tween.target.progress),
-						action: "paused"
-					})
-				},
-				onUpdateParams:["{self}"]
-			})
-			.to(progress, timeAnim/4, {
-				yPercent: 20,
-				autoAlpha: 0,
-				scale: 0.6,
-				delay: timeAnim/3,
-				ease: Power3.easeOut
-			})
-			.fromTo(done, timeAnim/4, {
-				yPercent: -20,
-				autoAlpha: 0,
-				scale: 0.6
-			},{
-				yPercent: 0,
-				autoAlpha: 1,
-				scale: 1,
-				ease: Power3.easeOut
-			})
-			.to(done, 2*timeAnim/3, {
-				yPercent: 20,
-				autoAlpha: 0,
-				scale: 0.6,
-				delay: timeAnim/3,
-				onStart: function() {
-					self.setState({
-						action: "play",
-						point: "two",
-						progress: 0,
-						event: ""
-					});
-				},
-				ease: Power3.easeOut
-			})
-			.fromTo(arrow, 2*timeAnim/3, {
-				yPercent: -20,
-				scale: 0.6,
-				autoAlpha: 0
-			},{
-				yPercent: 0,
-				scale: 1,
-				autoAlpha: 1,
-				delay: timeAnim/2,
-				ease: Power3.easeOut,
-				onComplete: function() {
-					self.setState({
-						action: "paused",
-						point: "one",
-						progress: 0,
-						event: ""
-					});
-				}
-			});
-		}
-	},
-	getInitialState: function() {
-		return {
-			action: "paused",
-			point:"",
-			progress: 0,
-			event: ""
-		}
-	},
-	render: function() {
-		return (
-			<div className="material_button" onClick={this.handleClick}>
-				<i ref="done_icon" className="material-icons done">done</i>
-				<div ref="progress" className="progress">{this.state.progress}</div>
-				<i ref="arrow_icon" className="material-icons">arrow_downward</i>
-				<Ripple activity={this.state.action} event={this.state.event} point={this.state.point} />
-			</div>
-		);
-	}
-
-});
-
-React.render(
-	<Button />,
-	page
-);
+function getPath(update, smoothing, pointsNew) {
+    let points = pointsNew ? pointsNew : [
+            [2, 12],
+            [12, update],
+            [22, 12]
+        ],
+        d = points.reduce((acc, point, i, a) => i === 0 ? `M ${point[0]},${point[1]}` : `${acc} ${getPoint(point, i, a, smoothing)}`, '');
+    return `<path d="${d}" />`;
+}
