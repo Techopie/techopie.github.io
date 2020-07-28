@@ -1,165 +1,135 @@
-
-.button {
-    --background: #2B3044;
-    --text: #fff;
-    --icon: #fff;
-    --icon-success: #16BF78;
-    display: flex;
-    outline: none;
-    border: 0;
-    padding: 0 22px 0 16px;
-    min-width: 147px;
-    overflow: hidden;
-    cursor: pointer;
-    border-radius: 9px;
-    background: var(--background);
-    transition: transform .2s;
-    &:active {
-        transform: scale(.95);
-    }
-    ul {
-        margin: 0;
-        padding: 13px 0;
-        list-style: none;
-        text-align: center;
-        position: relative;
-        backface-visibility: hidden;
-        font-size: 16px;
-        font-weight: 500;
-        line-height: 25px;
-        color: var(--text);
-        li {
-            &:not(:first-child) {
-                top: var(--t, 13px);
-                left: 0;
-                position: absolute;
-            }
-            &:nth-child(2) {
-                --t: 64px;
-            }
-            &:nth-child(3) {
-                --t: 115px;
-            }
-        }
-    }
-    .icon {
-        width: 24px;
-        height: 24px;
-        position: relative;
-        display: inline-block;
-        vertical-align: top;
-        margin: 14px 10px 0 0;
-        transform: translateY(calc(var(--y, 0) * 1px));
-        svg {
-            width: var(--w, 14px);
-            height: var(--h, 15px);
-            display: block;
-            fill: none;
-            stroke: var(--s, var(--icon));
-            stroke-width: var(--sw, 2);
-            stroke-linejoin: round;
-            stroke-linecap: round;
-        }
-        & > svg,
-        div {
-            left: var(--l, 7px);
-            top: var(--t, 2px);
-            position: absolute;
-        }
-        & > svg {
-            transform: translateY(calc(var(--y, 0) * 1px));
-            polyline,
-            line {
-                stroke-dasharray: var(--a, 12px);
-                stroke-dashoffset: var(--o, 0);
-                stroke: var(--s, var(--icon));
-                transition: stroke-dashoffset var(--d, .15s), stroke .4s;
-            }
-            polyline {
-                --d: .25s;
-                --a: 17px;
-                --o: 5.5px;
-            }
-        }
-        div {
-            --w: 24px;
-            --h: 24px;
-            --l: 0;
-            --t: 8px;
-            --sw: 1.5;
-        }
-    }
-    &.loading {
-        ul {
-            animation: text 1750ms linear forwards 100ms;
-        }
-        &.complete {
-            .icon {
-                svg {
-                    line {
-                        --o: 12px;
-                    }
-                    polyline {
-                        --o: 0;
-                        --s: var(--icon-success);
-                    }
-                }
-            }
-        }
-    }
-}
-
-@keyframes text {
-    18%,
-    82% {
-        transform: translateY(-100%);
-    }
-    100% {
-        transform: translateY(-200%);
-    }
-}
-
-html {
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-}
-
-* {
-    box-sizing: inherit;
-    &:before,
-    &:after {
-        box-sizing: inherit;
-    }
-}
-
-// Center & dribbble
+<style>
+/*===============================
+=            GENERAL            =
+===============================*/
+/*----------  FONTS  ----------*/
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic,900,900italic&subset=latin,greek);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Mono:400,100,100italic,300,300italic,400italic,500,500italic,700,700italic);
+/*----------  VARIABLES  ----------*/
+html,
 body {
-    min-height: 100vh;
-    display: flex;
-    font-family: 'Roboto', Arial;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    background: #F6F8FF;
-    .dribbble {
-        position: fixed;
-        display: block;
-        right: 20px;
-        bottom: 20px;
-        img {
-            display: block;
-            height: 28px;
-        }
-    }
-    .twitter {
-        position: fixed;
-        display: block;
-        right: 64px;
-        bottom: 14px;
-        svg {
-            width: 32px;
-            height: 32px;
-            fill: #1da1f2;
-        }
-    }
+  margin: 0;
+  padding: 0;
 }
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 100%;
+  color: #1f2e3e;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  align-items: center;
+  background-color: #2196f3;
+}
+#page.orange {
+  background-color: #ff5722;
+}
+#page .material_button {
+  position: relative;
+  cursor: pointer;
+  width: 64px;
+  height: 64px;
+  line-height: 64px;
+  text-align: center;
+}
+#page .material_button:before {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  content: "";
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  position: absolute;
+  -moz-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  -moz-transition: opacity 0.25s ease-out;
+  -o-transition: opacity 0.25s ease-out;
+  -webkit-transition: opacity 0.25s ease-out;
+  transition: opacity 0.25s ease-out;
+}
+#page .material_button:hover:before {
+  opacity: 1;
+}
+#page .material_button i {
+  position: relative;
+  height: 64px;
+  width: 64px;
+  line-height: 64px;
+  position: relative;
+  z-index: 99;
+}
+#page .material_button i.done {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+#page .material_button svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -moz-transform: translate3d(-50%, -50%, 0);
+  -ms-transform: translate3d(-50%, -50%, 0);
+  -webkit-transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0);
+  z-index: 0;
+  overflow: visible;
+}
+#page .material_button svg circle {
+  fill: #fff;
+}
+#page .material_button svg circle#green_ripple {
+  fill: #8bc34a;
+}
+#page .material_button .progress {
+  font-family: 'Roboto Mono', sans-serif;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 9;
+}
+
+footer {
+  position: absolute;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  text-align: center;
+  padding: 16px 0;
+  color: #FFFFFF;
+  font-size: 14px;
+}
+footer a {
+  color: #1e59af;
+}
+</style>
+<script>
+  window.console = window.console || function(t) {};
+</script>
+<script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
