@@ -21,7 +21,7 @@ https://stackoverflow.com/questions/18239430/cannot-set-property-innerhtml-of-nu
 
 window.onload = function() {
 document.getElementById("message").innerHTML = "Hello <b>World</b> <i>testing</i>"
-        what();
+        myResponce();
 
         function myResponce() {
  document.getElementById("message").innerHTML = "It's not you, it's me!";"
