@@ -33,3 +33,4 @@ function myResponse() {
 
 
 window.alert("Hello alert test")
+console.log("console testing");
